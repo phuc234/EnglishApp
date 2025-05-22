@@ -1,0 +1,60 @@
+[
+  {
+    "id": "q1",
+    "sentenceBeforeBlank": "I am a",
+    "sentenceAfterBlank": ".",
+    "audioFileName": "i_am_a_man",
+    "options": [
+      {
+        "id": "man",
+        "prefix": "A",
+        "text": "Man"
+      },
+      {
+        "id": "girl",
+        "prefix": "B",
+        "text": "Girl"
+      },
+      {
+        "id": "men",
+        "prefix": "C",
+        "text": "Men"
+      },
+      {
+        "id": "boy",
+        "prefix": "D",
+        "text": "Boy"
+      }
+    ],
+    "correctAnswerId": "man"
+  },
+  {
+    "id": "q2",
+    "sentenceBeforeBlank": "She is a",
+    "sentenceAfterBlank": ".",
+    "audioFileName": "she_is_a_girl",
+    "options": [
+      {
+        "id": "boy",
+        "prefix": "A",
+        "text": "Boy"
+      },
+      {
+        "id": "girl",
+        "prefix": "B",
+        "text": "Girl"
+      },
+      {
+        "id": "man",
+        "prefix": "C",
+        "text": "Man"
+      },
+      {
+        "id": "woman",
+        "prefix": "D",
+        "text": "Woman"
+      }
+    ],
+    "correctAnswerId": "girl"
+  }
+]

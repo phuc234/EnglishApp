@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".ListeningQuestionActivity"> <androidx.appcompat.widget.Toolbar
+    android:id="@+id/toolbar"
+    android:layout_width="0dp"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@android:color/white"
+    android:elevation="4dp"
+    app:navigationIcon="@drawable/ic_arrow_back" app:titleTextColor="@android:color/black"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/instructionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Điền đáp án vào chỗ trống" android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="6dp"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/iconsContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="20dp"
+        android:gravity="center" android:paddingHorizontal="16dp"
+        android:layout_marginTop="24dp" app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+        <ImageView
+            android:id="@+id/speakerIcon"
+            android:layout_width="60dp" android:layout_height="60dp"
+            android:src="@drawable/sound" android:background="@drawable/circle_blue_background" android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="centerInside"/>
+
+        <ImageView
+            android:id="@+id/turtleIcon"
+            android:layout_width="40dp" android:layout_height="40dp"
+            android:layout_marginStart="24dp" android:src="@drawable/slow" android:background="@drawable/circle_blue_light_background" android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="centerInside"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sentenceText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="I am a ___." android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="32dp" app:layout_constraintTop_toBottomOf="@+id/iconsContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/optionsRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="32dp" app:layout_constraintTop_toBottomOf="@+id/sentenceText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_listen"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/checkButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="KIỂM TRA" android:textSize="18sp"
+        android:paddingVertical="12dp"
+        app:cornerRadius="8dp"
+        app:backgroundTint="@color/button_gray_background" android:textColor="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
