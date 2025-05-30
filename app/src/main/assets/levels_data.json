@@ -1,0 +1,48 @@
+[
+  {
+    "id": "level_1",
+    "name": "Cấp Độ Cơ Bản",
+    "required_score_to_unlock_next": 100,
+    "modules": [
+      {
+        "id": "module_vocalbulary_1",
+        "name": "Từ vựng cơ bản",
+        "image_name": "tuvung",
+        "type": "vocabulary",
+        "description": "Học các từ vựng thiết yếu hàng ngày.",
+        "exercises_file": "vocabulary_questions.json"
+      },
+      {
+        "id": "module_question_1",
+        "name": "Viết",
+        "image_name": "viet1",
+        "type": "question",
+        "description": "Nắm vững các cấu trúc ngữ pháp cơ bản.",
+        "exercises_file": "question.json"
+      },
+      {
+        "id": "module_listening_1",
+        "name": "Nghe hiểu đơn giản",
+        "image_name": "nghe1",
+        "type": "listening",
+        "description": "Thực hành nghe và hiểu.",
+        "exercises_file": "listening_question.json"
+      }
+    ]
+  },
+  {
+    "id": "level_2",
+    "name": "Cấp Độ Trung Bình",
+    "required_score_to_unlock_next": 250,
+    "modules": [
+      {
+        "id": "module_grammar_2",
+        "name": "Ngữ pháp Nâng cao",
+        "image_name": "icon_grammar",
+        "type": "grammar",
+        "description": "Đi sâu vào các chủ điểm ngữ pháp phức tạp hơn.",
+        "exercises_file": "grammar_exercises_level2.json"
+      }
+    ]
+  }
+]
