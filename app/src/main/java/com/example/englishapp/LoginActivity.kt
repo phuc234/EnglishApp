@@ -1,44 +1,67 @@
+package com.example.englishapp // TODO: Thay thế bằng package thực tế của bạn
 
-package com.example.englishapp // TODO: Thay thế bằng package thực tế
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast // Import Toast nếu cần
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.englishapp.databinding.ActivityLoginBinding // TODO: Import binding cho layout đăng nhập
+import com.example.englishapp.databinding.ActivityLoginBinding // Import binding cho layout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import android.util.Log // Import Log
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // TODO: Triển khai logic lấy thông tin từ EditText và kiểm tra đăng nhập
-        // Ví dụ: val username = binding.editTextUsername.text.toString()
-        // val password = binding.editTextPassword.text.toString()
-        // ... kiểm tra username/password ...
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
-        // Đặt Listener cho nút Đăng nhập
-        binding.buttonLogin.setOnClickListener {
-            // TODO: Thay thế bằng kết quả kiểm tra đăng nhập thực tế
-            val isLoginSuccessful = true // Giả định đăng nhập thành công
-
-            if (isLoginSuccessful) {
-                // Tạo Intent để chuyển sang TopicSelectionActivity
-                val intent = Intent(this, TopicSelectionActivity::class.java) // TODO: Thay TopicSelectionActivity bằng tên Activity bạn tạo
-                startActivity(intent)
-
-                // Tùy chọn: Kết thúc LoginActivity để người dùng không quay lại màn hình đăng nhập bằng nút Back
-                finish()
-            } else {
-                // TODO: Hiển thị thông báo lỗi đăng nhập (ví dụ: Toast.makeText(this, "Sai tên đăng nhập hoặc mật khẩu", Toast.LENGTH_SHORT).show())
-            }
+//         Kiểm tra nếu người dùng đã đăng nhập, chuyển hướng ngay lập tức
+        if (auth.currentUser != null) {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish() // Đóng LoginActivity để không quay lại
         }
 
-        // TODO: Thêm Listener cho text Quên mật khẩu và Đăng ký ngay nếu cần điều hướng
-        // binding.textViewForgotPassword.setOnClickListener { ... }
-        // binding.textViewSignUp.setOnClickListener { ... }
+        // Xử lý sự kiện nút Đăng nhập
+        binding.buttonLogin.setOnClickListener {
+            val email = binding.emailEditText.text.toString().trim()
+            val password = binding.passwordEditText.text.toString().trim()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ Email và Mật khẩu.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        Log.d("LoginActivity", "Đăng nhập thành công: ${auth.currentUser?.email}")
+                        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, HomeActivity::class.java))
+                        finish() // Đóng LoginActivity
+                    } else {
+                        Log.e("LoginActivity", "Đăng nhập thất bại: ${task.exception?.message}")
+                        Toast.makeText(this, "Đăng nhập thất bại: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+        }
+
+        // Xử lý sự kiện TextView "Đăng ký ngay"
+        binding.textViewSignUp.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java) // Chuyển sang màn hình Đăng ký
+            startActivity(intent)
+        }
+
+        // TODO: Xử lý sự kiện "Quên mật khẩu?" nếu cần
+        binding.textViewForgotPassword.setOnClickListener {
+            Toast.makeText(this, "Chức năng quên mật khẩu đang được phát triển.", Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -1,88 +1,105 @@
-package com.example.englishapp.VocabularyScreen
+package com.example.englishapp.adapter
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.englishapp.databinding.ItemVocabularyOptionBinding
+import com.example.englishapp.R // Đảm bảo import R đúng
+import com.example.englishapp.data.VocabularyOption // Import data class VocabularyOption
+import com.example.englishapp.databinding.ItemVocabularyOptionBinding // Import lớp binding cho layout item
+import com.google.android.material.card.MaterialCardView // Import MaterialCardView
 
+// Adapter cho RecyclerView hiển thị các tùy chọn từ vựng
 class VocabularyOptionAdapter(
-    private val options: List<VocabularyOption>, // Danh sách dữ liệu
-    private val onItemClick: (VocabularyOption, Int) -> Unit // Lambda xử lý click, truyền cả item và vị trí
-) : RecyclerView.Adapter<VocabularyOptionAdapter.ViewHolder>() {
+    private val options: MutableList<VocabularyOption>, // Danh sách các tùy chọn
+    private val onItemClick: (VocabularyOption, Int) -> Unit // Lambda xử lý click item
+) : RecyclerView.Adapter<VocabularyOptionAdapter.OptionViewHolder>() {
 
-    // ViewHolder: Giữ các tham chiếu đến View của một item
-    class ViewHolder(val binding: ItemVocabularyOptionBinding) : RecyclerView.ViewHolder(binding.root)
+    private var selectedPosition: Int = RecyclerView.NO_POSITION // Lưu vị trí của item được chọn
 
-    // Tạo ViewHolder mới khi cần
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // Inflate layout item bằng View Binding
-        val binding = ItemVocabularyOptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+    // ViewHolder chứa các View của một item
+    inner class OptionViewHolder(val binding: ItemVocabularyOptionBinding) : RecyclerView.ViewHolder(binding.root) {
+        val imageView: ImageView = binding.optionImageView
+        val textView: TextView = binding.optionTextView
     }
 
-    // Gán dữ liệu vào View của ViewHolder
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    // Tạo ViewHolder mới
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionViewHolder {
+        val binding = ItemVocabularyOptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return OptionViewHolder(binding)
+    }
+
+    // Gán dữ liệu vào ViewHolder
+    override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
         val option = options[position]
 
-        // Gán dữ liệu vào các View
-        holder.binding.optionImage.setImageResource(option.imageResId)
-        holder.binding.optionText.text = option.text
+        // Lấy ID resource của ảnh từ tên file ảnh
+        val imageResId = holder.itemView.context.resources.getIdentifier(
+            option.imageFileName, "drawable", holder.itemView.context.packageName
+        )
 
-        // Thiết lập trạng thái UI dựa trên isSelected
-        if (option.isSelected) {
-            holder.binding.root.strokeColor = Color.parseColor("#70E000") // Màu viền xanh lá khi chọn
-            holder.binding.root.setCardBackgroundColor(Color.parseColor("#E8F5E9")) // Sử dụng phương thức setter
+        if (imageResId != 0) {
+            holder.imageView.setImageResource(imageResId)
         } else {
-            holder.binding.root.strokeColor = Color.TRANSPARENT // Viền trong suốt khi không chọn
-            holder.binding.root.setCardBackgroundColor(Color.WHITE) // Sử dụng phương thức setter
+            // Xử lý trường hợp không tìm thấy ảnh, ví dụ: hiển thị ảnh placeholder
+//            holder.imageView.setImageResource(R.drawable.ic_image_placeholder) // Đảm bảo bạn có một placeholder icon
         }
 
+        holder.textView.text = option.text
 
-        // Thiết lập Listener cho sự kiện click
+        // Xử lý trạng thái được chọn/bỏ chọn
+        val cardView = holder.binding.root as MaterialCardView
+        if (position == selectedPosition) {
+            cardView.setStrokeColor(holder.itemView.context.getColor(R.color.selected_option_stroke_color))
+            cardView.setCardBackgroundColor(holder.itemView.context.getColor(R.color.selected_option_color))
+        } else {
+            cardView.setStrokeColor(holder.itemView.context.getColor(R.color.unselected_option_stroke_color))
+            cardView.setCardBackgroundColor(holder.itemView.context.getColor(R.color.white))
+        }
+
+        // Thiết lập Listener cho item
         holder.itemView.setOnClickListener {
-            onItemClick(option, position) // Gọi lambda khi click, truyền item và vị trí
+            onItemClick(option, position) // Gọi lambda khi click
         }
     }
 
-    // Trả về tổng số item trong danh sách
+    // Trả về số lượng item trong danh sách
     override fun getItemCount(): Int {
         return options.size
     }
 
-    // Hàm cập nhật một item cụ thể (hữu ích khi đổi trạng thái isSelected)
-    fun updateItem(position: Int, updatedOption: VocabularyOption) {
-        // Trong thực tế, bạn nên cập nhật danh sách dữ liệu gốc
-        // và sau đó thông báo cho adapter. Vì List là immutable,
-        // bạn có thể cần sử dụng MutableList hoặc các thư viện diffing.
-        // Với ví dụ đơn giản này, chúng ta giả định có cách cập nhật dữ liệu.
-        // Sau khi cập nhật dữ liệu, gọi notifyItemChanged:
-        // notifyItemChanged(position)
+    // Hàm chọn một item và cập nhật RecyclerView
+    fun selectItem(position: Int) {
+        val oldSelectedPosition = selectedPosition
+        if (selectedPosition != position) {
+            selectedPosition = position
+            notifyItemChanged(oldSelectedPosition) // Cập nhật trạng thái của item cũ
+            notifyItemChanged(selectedPosition) // Cập nhật trạng thái của item mới
+        } else {
+            // Nếu click lại vào item đã chọn, có thể bỏ chọn nó (tùy logic game)
+            // selectedPosition = RecyclerView.NO_POSITION
+            // notifyItemChanged(oldSelectedPosition)
+        }
     }
 
-    // Hàm đơn giản để tìm và cập nhật trạng thái chọn
-    fun selectItem(selectedPosition: Int) {
-        // Trước hết, bỏ chọn item cũ (nếu có item nào đang được chọn)
-        val currentlySelectedItemIndex = options.indexOfFirst { it.isSelected }
-        if (currentlySelectedItemIndex != -1 && currentlySelectedItemIndex != selectedPosition) {
-            options[currentlySelectedItemIndex].isSelected = false // Cập nhật dữ liệu
-            notifyItemChanged(currentlySelectedItemIndex) // Thông báo Adapter cập nhật UI
-        }
-
-        // Chọn item mới (nếu nó chưa được chọn)
-        if (currentlySelectedItemIndex != selectedPosition) {
-            options[selectedPosition].isSelected = true // Cập nhật dữ liệu
-            notifyItemChanged(selectedPosition) // Thông báo Adapter cập nhật UI
-        }
-        // Nếu click lại vào item đã chọn, có thể bỏ chọn nó (tùy logic game)
-        // else {
-        //    options[selectedPosition].isSelected = false
-        //    notifyItemChanged(selectedPosition)
-        // }
-    }
-
-    // Hàm lấy item hiện tại đang được chọn
+    // Hàm trả về item đang được chọn
     fun getSelectedItem(): VocabularyOption? {
-        return options.find { it.isSelected }
+        return if (selectedPosition != RecyclerView.NO_POSITION && selectedPosition < options.size) {
+            options[selectedPosition]
+        } else {
+            null
+        }
+    }
+
+    // Hàm để reset lựa chọn (ví dụ: khi chuyển câu hỏi mới)
+    fun clearSelection() {
+        val oldSelectedPosition = selectedPosition
+        selectedPosition = RecyclerView.NO_POSITION
+        if (oldSelectedPosition != RecyclerView.NO_POSITION) {
+            notifyItemChanged(oldSelectedPosition)
+        }
     }
 }

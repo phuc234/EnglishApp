@@ -5,7 +5,7 @@
         android:icon="@drawable/trainslat" android:title=" " />
     <item
         android:id="@+id/navigation_trainslate"
-        android:icon="@drawable/trainslat" android:title=" " />
+        android:icon="@drawable/translate" android:title=" " />
     <item
         android:id="@+id/navigation_rank"
         android:icon="@drawable/rank" android:title=" " />

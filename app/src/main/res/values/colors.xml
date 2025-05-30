@@ -3,5 +3,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="button_gray_background">#D3D3D3</color> <color name="green_answer_text">#00C853</color>
+    <color name="selected_option_color">#FFD700</color> <color name="selected_option_stroke_color">#FFA500</color>
+    <color name="unselected_option_stroke_color">#CCCCCC</color>
+    <color name="correct_answer_color">#4CAF50</color> <color name="wrong_answer_color">#F44336</color>
+    <color name="green_header">#8BC34A</color>
+    <color name="login_text_color">#FF4444</color> <color name="register_text_color">#FF4444</color>
+    <color name="yellow_highlight">#FFF9C4</color>
+    <color name="gold_rank">#FFEB3B</color>
+    <color name="silver_rank">#656E73</color>
+    <color name="bronze_rank">#B8853F</color>
 
 </resources>

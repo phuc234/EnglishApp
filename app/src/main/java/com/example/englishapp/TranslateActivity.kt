@@ -54,10 +54,7 @@ class TranslateActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.navigation_home -> {
                     // Khi nhấn vào mục Home, chuyển về LevelModuleActivity
-                    val intent = Intent(this, LevelModuleActivity::class.java)
-                    // Sử dụng cờ để đưa LevelModuleActivity lên đầu stack nếu nó đã tồn tại
-                    // hoặc tạo mới nếu chưa có, và xóa các Activity trên nó.
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     true
                 }
@@ -68,17 +65,17 @@ class TranslateActivity : AppCompatActivity() {
                 }
                 R.id.navigation_rank -> {
                     // Chuyển sang RankActivity
-                    // val intent = Intent(this, RankActivity::class.java) // TODO: Thay RankActivity bằng tên Activity thực tế
-                    // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    // startActivity(intent)
+                     val intent = Intent(this, RankingActivity::class.java)
+                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                     startActivity(intent)
                     Toast.makeText(this, "Chuyển sang màn hình Xếp hạng.", Toast.LENGTH_SHORT).show()
                     true
                 }
                 R.id.navigation_profile -> {
                     // Chuyển sang ProfileActivity
-                    // val intent = Intent(this, ProfileActivity::class.java) // TODO: Thay ProfileActivity bằng tên Activity thực tế
-                    // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    // startActivity(intent)
+                     val intent = Intent(this, ProfileActivity::class.java)
+                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                     startActivity(intent)
                     Toast.makeText(this, "Chuyển sang màn hình Hồ sơ.", Toast.LENGTH_SHORT).show()
                     true
                 }

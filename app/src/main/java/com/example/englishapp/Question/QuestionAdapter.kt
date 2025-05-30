@@ -1,98 +1,106 @@
-package com.example.englishapp.adapter // TODO: Thay thế bằng package thực tế của bạn
+package com.example.englishapp.adapter
 
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.englishapp.data.Question // TODO: Import Data Class Question
-import com.example.englishapp.databinding.ItemQuestionBinding // TODO: Import lớp binding cho layout item
+import com.example.englishapp.R // Đảm bảo import R đúng
+import com.example.englishapp.data.Question // Import data class Question
+import com.example.englishapp.databinding.ItemQuestionBinding // Import lớp binding cho layout item
 
+// Adapter cho RecyclerView hiển thị các câu hỏi điền từ
 class QuestionAdapter(
-    private val questions: MutableList<Question> // Sử dụng MutableList để lưu trữ đáp án người dùng
-) : RecyclerView.Adapter<QuestionAdapter.ViewHolder>() {
+    private val questions: MutableList<Question> // Danh sách các câu hỏi
+) : RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder>() {
 
-    // ViewHolder: Giữ các tham chiếu đến View của một item
-    class ViewHolder(val binding: ItemQuestionBinding) : RecyclerView.ViewHolder(binding.root) {
-        // Biến để giữ tham chiếu đến TextWatcher hiện tại để tránh lỗi khi RecyclerView tái sử dụng View
-        var textWatcher: TextWatcher? = null
-    }
+    // ViewHolder chứa các View của một item
+    inner class QuestionViewHolder(val binding: ItemQuestionBinding) : RecyclerView.ViewHolder(binding.root) {
+        val part1TextView = binding.part1TextView
+        val answerEditText = binding.answerEditText
+        val part2TextView = binding.part2TextView
+        val feedbackTextView = binding.feedbackTextView
 
-    // Tạo ViewHolder mới khi cần
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // Inflate layout item bằng View Binding
-        val binding = ItemQuestionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
-    }
+        // TextWatcher để cập nhật userAnswer khi người dùng nhập
+        private var textWatcher: TextWatcher? = null
 
-    // Gán dữ liệu vào View của ViewHolder
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val question = questions[position]
+        fun bind(question: Question, position: Int) {
+            // Loại bỏ TextWatcher cũ để tránh lỗi khi RecyclerView tái sử dụng ViewHolder
+            textWatcher?.let { answerEditText.removeTextChangedListener(it) }
 
-        // Gán các phần của câu hỏi vào TextViews
-        // Giả định format là: Phần trước chỗ trống, Phần sau chỗ trống
-        // Nếu format khác (ví dụ: nhiều chỗ trống), cần điều chỉnh logic này
-        if (question.parts.size > question.blankIndex) {
-            holder.binding.questionPartBeforeBlank.text = question.parts[0] // Phần đầu tiên
-        } else {
-            holder.binding.questionPartBeforeBlank.text = "" // Không có phần trước
-        }
-
-        if (question.parts.size > question.blankIndex + 1) {
-            holder.binding.questionPartAfterBlank.text = question.parts[1] // Phần thứ hai
-        } else {
-            holder.binding.questionPartAfterBlank.text = "" // Không có phần sau
-        }
-
-
-        // Xóa TextWatcher cũ trước khi thêm cái mới (để tránh lỗi tái sử dụng View)
-        holder.binding.blankInput.removeTextChangedListener(holder.textWatcher)
-
-        // Gán đáp án đã nhập (nếu có)
-        // TODO: Cần một cách để lưu trữ đáp án người dùng, ví dụ thêm vào Data Class Question
-        // Hiện tại, chúng ta sẽ thêm một thuộc tính tạm vào Data Class hoặc dùng Map riêng
-        // Để đơn giản, chúng ta sẽ thêm một thuộc tính tạm vào Data Class Question
-        // (Bạn cần sửa Data Class Question để thêm 'var userAnswer: String? = null')
-        // holder.binding.blankInput.setText(question.userAnswer)
-
-
-        // Thêm TextWatcher để theo dõi nhập liệu của người dùng
-        holder.textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                // Lưu đáp án của người dùng vào danh sách dữ liệu
-                // TODO: Cần sửa Data Class Question để thêm 'var userAnswer: String? = null'
-                // questions[position].userAnswer = s.toString()
+            // Hiển thị các phần của câu hỏi
+            part1TextView.text = question.parts[0]
+            if (question.parts.size > question.blankIndex + 1) {
+                part2TextView.text = question.parts[question.blankIndex + 1]
+                part2TextView.visibility = ViewGroup.VISIBLE
+            } else {
+                part2TextView.visibility = ViewGroup.GONE
             }
-        }
-        holder.binding.blankInput.addTextChangedListener(holder.textWatcher)
 
-        // TODO: Có thể thêm logic để hiển thị phản hồi (đúng/sai)
-        // holder.binding.feedbackText.visibility = if (question.showFeedback) View.VISIBLE else View.GONE
-        // holder.binding.feedbackText.text = question.feedbackText
+            // Đặt văn bản đã nhập nếu có
+            answerEditText.setText(question.userAnswer)
+
+            // Thiết lập TextWatcher mới
+            textWatcher = object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    questions[position].userAnswer = s.toString() // Cập nhật userAnswer trong Data Model
+                    questions[position].isCorrect = null // Đặt lại trạng thái feedback khi người dùng nhập lại
+                    updateFeedback(position) // Cập nhật feedback ngay lập tức để ẩn nếu đang hiển thị
+                }
+                override fun afterTextChanged(s: Editable?) {}
+            }
+            answerEditText.addTextChangedListener(textWatcher)
+
+            // Cập nhật giao diện feedback
+            updateFeedback(position)
+        }
     }
 
-    // Trả về tổng số item trong danh sách
+    // Tạo ViewHolder mới
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionViewHolder {
+        val binding = ItemQuestionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return QuestionViewHolder(binding)
+    }
+
+    // Gán dữ liệu vào ViewHolder
+    override fun onBindViewHolder(holder: QuestionViewHolder, position: Int) {
+        holder.bind(questions[position], position)
+    }
+
+    // Trả về số lượng item trong danh sách
     override fun getItemCount(): Int {
         return questions.size
     }
 
-    // Hàm để lấy tất cả đáp án người dùng đã nhập
-    // TODO: Cần sửa Data Class Question để thêm 'var userAnswer: String? = null'
-    /*
-    fun getUserAnswers(): List<String?> {
-        return questions.map { it.userAnswer }
+    // Hàm cập nhật feedback cho một item cụ thể
+    fun updateFeedback(position: Int) {
+        if (position >= 0 && position < questions.size) {
+            val question = questions[position]
+            val holder = (questionsRecyclerView.findViewHolderForAdapterPosition(position) as? QuestionViewHolder)
+            holder?.let { // Chỉ cập nhật nếu ViewHolder còn hiển thị
+                if (question.isCorrect != null) {
+                    it.feedbackTextView.visibility = ViewGroup.VISIBLE
+                    if (question.isCorrect == true) {
+                        it.feedbackTextView.text = "Chính xác!"
+                        it.feedbackTextView.setTextColor(it.itemView.context.getColor(R.color.correct_answer_color)) // Màu xanh lá
+                    } else {
+                        it.feedbackTextView.text = "Sai rồi. Đáp án đúng: ${question.correctAnswer}"
+                        it.feedbackTextView.setTextColor(it.itemView.context.getColor(R.color.wrong_answer_color)) // Màu đỏ
+                    }
+                } else {
+                    it.feedbackTextView.visibility = ViewGroup.GONE
+                }
+            }
+        }
     }
-    */
 
-    // TODO: Hàm để cập nhật trạng thái feedback sau khi kiểm tra
-    /*
-    fun updateFeedback(position: Int, isCorrect: Boolean) {
-        questions[position].showFeedback = true
-        questions[position].feedbackText = if (isCorrect) "Đúng!" else "Sai!"
-        notifyItemChanged(position)
+    // Hàm để lấy tất cả câu trả lời của người dùng
+    fun getQuestionsWithUserAnswers(): List<Question> {
+        return questions // Trả về danh sách đã được cập nhật userAnswer
     }
-    */
+
+    // Biến tạm để truy cập RecyclerView từ hàm updateFeedback (chỉ sử dụng cho mục đích demo)
+    // Trong một ứng dụng thực tế, bạn có thể truyền RecyclerView vào Adapter hoặc sử dụng callback
+    lateinit var questionsRecyclerView: RecyclerView // Sẽ được gán trong Activity
 }

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "q1",
+    "questionText": "Đâu là \"quả dâu\"?",
+    "options": [
+      {
+        "id": "strawberry",
+        "imageFileName": "strawberry",
+        "text": "Strawberry"
+      },
+      {
+        "id": "orange",
+        "imageFileName": "orange",
+        "text": "Orange"
+      },
+      {
+        "id": "banana",
+        "imageFileName": "banana",
+        "text": "Banana"
+      },
+      {
+        "id": "apple",
+        "imageFileName": "apple",
+        "text": "Apple"
+      }
+    ],
+    "correctAnswerId": "strawberry"
+  },
+  {
+    "id": "q2",
+    "questionText": "Chọn hình ảnh của \"bóng đá\".",
+    "options": [
+      {
+        "id": "basketball",
+        "imageFileName": "basketball",
+        "text": "Basketball"
+      },
+      {
+        "id": "football",
+        "imageFileName": "football",
+        "text": "Football"
+      },
+      {
+        "id": "swimming",
+        "imageFileName": "swimming",
+        "text": "Swimming"
+      },
+      {
+        "id": "volleyball",
+        "imageFileName": "volleyball",
+        "text": "Volleyball"
+      }
+    ],
+    "correctAnswerId": "football"
+  }
+]

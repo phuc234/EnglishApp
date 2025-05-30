@@ -4,7 +4,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.englishapp.data.OptionItem // TODO: Import Data Class OptionItem
+import com.example.englishapp.data.OptionItem
 import com.example.englishapp.databinding.ItemListenBinding // TODO: Import lớp binding cho layout item
 import com.google.android.material.card.MaterialCardView
 
@@ -12,6 +12,7 @@ class OptionAdapter(
     private val options: MutableList<OptionItem>, // Sử dụng MutableList để dễ dàng cập nhật trạng thái chọn
     private val onItemClick: (OptionItem, Int) -> Unit // Lambda xử lý click, truyền item và vị trí
 ) : RecyclerView.Adapter<OptionAdapter.ViewHolder>() {
+    private var selectedPosition: Int = RecyclerView.NO_POSITION // Lưu vị trí của item được chọn
 
     // ViewHolder: Giữ các tham chiếu đến View của một item
     class ViewHolder(val binding: ItemListenBinding) : RecyclerView.ViewHolder(binding.root)
@@ -80,5 +81,12 @@ class OptionAdapter(
     // Hàm lấy item hiện tại đang được chọn
     fun getSelectedItem(): OptionItem? {
         return options.find { it.isSelected }
+    }
+    fun clearSelection() {
+        val oldSelectedPosition = selectedPosition
+        selectedPosition = RecyclerView.NO_POSITION
+        if (oldSelectedPosition != RecyclerView.NO_POSITION) {
+            notifyItemChanged(oldSelectedPosition)
+        }
     }
 }

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.englishapp.data.Topic // TODO: Import Data Class Topic
-import com.example.englishapp.databinding.ActivityTopicBinding // TODO: Import lớp binding cho layout item
+import com.example.englishapp.databinding.ItemTopicBinding // TODO: Import lớp binding cho layout item
 
 class TopicAdapter(
     private val topics: List<Topic>, // Danh sách dữ liệu chủ đề
@@ -12,12 +12,12 @@ class TopicAdapter(
 ) : RecyclerView.Adapter<TopicAdapter.ViewHolder>() {
 
     // ViewHolder: Giữ các tham chiếu đến View của một item
-    class ViewHolder(val binding: ActivityTopicBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemTopicBinding) : RecyclerView.ViewHolder(binding.root)
 
     // Tạo ViewHolder mới khi cần
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // Inflate layout item bằng View Binding
-        val binding = ActivityTopicBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemTopicBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

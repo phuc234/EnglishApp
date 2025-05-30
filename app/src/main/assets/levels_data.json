@@ -2,10 +2,10 @@
   {
     "id": "level_1",
     "name": "Cấp Độ Cơ Bản",
-    "required_score_to_unlock_next": 100,
+    "required_score_to_unlock_next": 0,
     "modules": [
       {
-        "id": "module_vocalbulary_1",
+        "id": "module_vocabulary_1",
         "name": "Từ vựng cơ bản",
         "image_name": "tuvung",
         "type": "vocabulary",
@@ -26,14 +26,14 @@
         "image_name": "nghe1",
         "type": "listening",
         "description": "Thực hành nghe và hiểu.",
-        "exercises_file": "listening_question.json"
+        "exercises_file": "listening_questions.json"
       }
     ]
   },
   {
     "id": "level_2",
     "name": "Cấp Độ Trung Bình",
-    "required_score_to_unlock_next": 250,
+    "required_score_to_unlock_next": 110,
     "modules": [
       {
         "id": "module_grammar_2",

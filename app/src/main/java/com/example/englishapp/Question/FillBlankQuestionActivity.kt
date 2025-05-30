@@ -1,113 +1,140 @@
-package com.example.englishapp // TODO: Thay thế bằng package thực tế của bạn
+package com.example.englishapp.Question
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.englishapp.adapter.QuestionAdapter // TODO: Import Adapter
-import com.example.englishapp.data.Question // TODO: Import Data Class Question
-import com.example.englishapp.databinding.ActivityQuestionBinding // TODO: Import lớp binding cho layout Activity
+import com.example.englishapp.adapter.QuestionAdapter
+import com.example.englishapp.data.Question
+import com.example.englishapp.databinding.ActivityQuestionBinding
+import com.example.englishapp.repository.FillBlankQuestionRepository
+import com.example.englishapp.LoginActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class FillBlankQuestionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityQuestionBinding
     private lateinit var questionAdapter: QuestionAdapter
+    private lateinit var fillBlankQuestionRepository: FillBlankQuestionRepository
 
-    // TODO: Dữ liệu mẫu cho danh sách câu hỏi. Trong thực tế, bạn sẽ tải từ nguồn khác.
-    // Cần sửa Data Class Question để thêm 'var userAnswer: String? = null'
-    private val questionList: MutableList<Question> = mutableListOf(
-        Question("q1", listOf("1. He is", "student."), 0),
-        Question("q2", listOf("2. We", "students."), 0),
-        Question("q3", listOf("3. He", "a student."), 0),
-        Question("q4", listOf("4. This is", "umbrella."), 0)
-        // TODO: Thêm các câu hỏi khác
-    )
+    private lateinit var auth: FirebaseAuth
 
-    // TODO: Danh sách đáp án đúng tương ứng với questionList (dựa vào ID hoặc vị trí)
-    private val correctAnswers = mapOf(
-        "q1" to "a",
-        "q2" to "are",
-        "q3" to "is",
-        "q4" to "an"
-    )
+    private var allQuestions: MutableList<Question> = mutableListOf()
 
+    // Biến tích lũy điểm trong phiên làm bài hiện tại
+    private var totalScoreEarnedInThisSession: Long = 0L // Đặt biến này để tích lũy điểm cục bộ
+
+    // Số điểm người dùng nhận được cho mỗi câu trả lời đúng
+    private val POINTS_PER_CORRECT_ANSWER = 10L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Khởi tạo binding và gán layout
         binding = ActivityQuestionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // --- Cấu hình Toolbar ---
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Hiển thị nút Back
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed() // Xử lý sự kiện khi bấm nút Back
+        auth = FirebaseAuth.getInstance()
+
+        if (auth.currentUser == null) {
+            Toast.makeText(this, "Bạn cần đăng nhập để làm bài test điền từ.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
         }
 
-        // --- Cấu hình RecyclerView ---
-        setupRecyclerView()
+        fillBlankQuestionRepository = FillBlankQuestionRepository(applicationContext)
 
-        // --- Cấu hình Listener cho nút KIỂM TRA ---
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setNavigationOnClickListener {
+            // Khi người dùng bấm nút Back trên toolbar, kết thúc bài và trả điểm về
+            Log.d("FillBlankActivity", "Người dùng bấm nút Back. Trả về điểm: $totalScoreEarnedInThisSession")
+            finishExerciseAndReturnScore(totalScoreEarnedInThisSession)
+        }
+
+        // Lấy tên file bài tập từ Intent
+        val exercisesFile = intent.getStringExtra("exercises_file")
+        if (exercisesFile != null) {
+            allQuestions = fillBlankQuestionRepository.getAllFillBlankQuestions(exercisesFile).toMutableList()
+        } else {
+            Toast.makeText(this, "Lỗi: Không tìm thấy file bài tập điền từ.", Toast.LENGTH_SHORT).show()
+            Log.e("FillBlankActivity", "Không nhận được tên file bài tập từ Intent.")
+            finishExerciseAndReturnScore(0L) // Trả về 0 điểm nếu không có file bài tập
+            return
+        }
+
+
+        if (allQuestions.isNotEmpty()) {
+            setupRecyclerView()
+        } else {
+            Toast.makeText(this, "Lỗi: Không tải được dữ liệu câu hỏi điền từ. Danh sách rỗng.", Toast.LENGTH_LONG).show()
+            Log.e("FillBlankActivity", "Không tải được dữ liệu câu hỏi điền từ. Danh sách rỗng hoặc file không đúng.")
+            finishExerciseAndReturnScore(0L) // Trả về 0 điểm nếu không có câu hỏi
+        }
+
         binding.checkButton.setOnClickListener {
             handleCheckButtonClick()
         }
     }
 
+    // Hàm này được đổi tên và chỉ cộng điểm vào biến cục bộ
+    private fun addScoreLocally(pointsToAdd: Long) {
+        totalScoreEarnedInThisSession += pointsToAdd
+        Log.d("FillBlankTest", "Điểm tích lũy trong phiên: $totalScoreEarnedInThisSession")
+        // Không cập nhật Firestore trực tiếp từ đây
+    }
+
     private fun setupRecyclerView() {
-        // Khởi tạo Adapter, truyền danh sách câu hỏi
-        questionAdapter = QuestionAdapter(questionList)
-
-        // Thiết lập LayoutManager (LinearLayoutManager cho danh sách dọc)
+        questionAdapter = QuestionAdapter(allQuestions)
         binding.questionsRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        // Gán Adapter cho RecyclerView
         binding.questionsRecyclerView.adapter = questionAdapter
-
-        // TODO: Có thể thêm ItemDecoration nếu cần
+        questionAdapter.questionsRecyclerView = binding.questionsRecyclerView
     }
 
     // Hàm xử lý khi click vào nút KIỂM TRA
     private fun handleCheckButtonClick() {
-        // TODO: Cần sửa Data Class Question để thêm 'var userAnswer: String? = null'
-        // và sửa Adapter để lưu userAnswer
-
-        // Lấy đáp án người dùng từ Adapter (cần triển khai hàm getUserAnswers trong Adapter)
-        // val userAnswers = questionAdapter.getUserAnswers()
-
         var correctCount = 0
-        // TODO: Lặp qua danh sách câu hỏi và so sánh đáp án người dùng với đáp án đúng
-        // Dựa trên cách bạn lưu trữ đáp án người dùng và đáp án đúng
+        val questionsWithUserAnswers = questionAdapter.getQuestionsWithUserAnswers()
 
-        // Ví dụ logic kiểm tra (cần sửa Data Class và Adapter trước):
-        /*
-        for (i in questionList.indices) {
-            val question = questionList[i]
-            val userAnswer = userAnswers[i]?.trim() // Lấy đáp án đã nhập và bỏ khoảng trắng
-            val correctAnswer = correctAnswers[question.id]?.trim() // Lấy đáp án đúng
+        for (i in questionsWithUserAnswers.indices) {
+            val question = questionsWithUserAnswers[i]
+            val userAnswer = question.userAnswer?.trim() // Lấy đáp án đã nhập và bỏ khoảng trắng
+            val correctAnswer = question.correctAnswer.trim() // Lấy đáp án đúng
 
             if (userAnswer.equals(correctAnswer, ignoreCase = true)) { // So sánh không phân biệt chữ hoa/thường
                 correctCount++
-                // TODO: Cập nhật UI item để hiển thị đúng
-                // questionAdapter.updateFeedback(i, true)
+                question.isCorrect = true // Cập nhật trạng thái đúng
+                addScoreLocally(POINTS_PER_CORRECT_ANSWER) // Cộng điểm vào biến cục bộ
             } else {
-                 // TODO: Cập nhật UI item để hiển thị sai
-                 // questionAdapter.updateFeedback(i, false)
+                question.isCorrect = false // Cập nhật trạng thái sai
             }
+
+            // Cập nhật UI item để hiển thị feedback (ví dụ: đổi màu ô nhập)
+            questionAdapter.updateFeedback(i)
         }
-        */
 
-        // Hiển thị kết quả tổng quát
-        // Toast.makeText(this, "Bạn đã trả lời đúng $correctCount / ${questionList.size} câu.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Bạn đã trả lời đúng $correctCount / ${questionsWithUserAnswers.size} câu.", Toast.LENGTH_LONG).show()
 
-        // Hiện tại chỉ hiển thị thông báo khi click nút
-        Toast.makeText(this, "Nút KIỂM TRA đã được bấm.", Toast.LENGTH_SHORT).show()
+        // Khi tất cả câu hỏi đã được kiểm tra, kết thúc Activity và trả điểm về HomeActivity
+        // Nếu bạn muốn người dùng có thể xem lại hoặc sửa, thì chỉ kết thúc khi họ bấm nút "Hoàn thành"
+        // Hiện tại, tôi sẽ kết thúc ngay sau khi kiểm tra tất cả câu hỏi
+        finishExerciseAndReturnScore(totalScoreEarnedInThisSession)
     }
 
-    // Override onSupportNavigateUp() nếu bạn có nút Back trên Toolbar
+    // Hàm này sẽ được gọi khi Activity bài tập kết thúc (bao gồm cả khi bấm nút back)
+    private fun finishExerciseAndReturnScore(score: Long) {
+        val resultIntent = Intent()
+        resultIntent.putExtra("score_earned", score) // Đặt điểm đã kiếm được vào Intent
+        setResult(RESULT_OK, resultIntent) // Đặt kết quả là OK
+        finish() // Đóng Activity bài tập
+    }
+
+    // Override onSupportNavigateUp để đảm bảo điểm được trả về khi người dùng bấm nút back trên Toolbar
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return true
+        // Gọi hàm finishExerciseAndReturnScore để trả điểm về HomeActivity
+        finishExerciseAndReturnScore(totalScoreEarnedInThisSession)
+        return true // Trả về true để hệ thống tự động xử lý nút back trên toolbar
     }
 }

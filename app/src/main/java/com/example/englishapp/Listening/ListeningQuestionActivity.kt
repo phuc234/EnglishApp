@@ -1,31 +1,39 @@
-package com.example.englishapp // TODO: Thay thế bằng package thực tế của bạn
+package com.example.englishapp.Listening
 
-import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log // Import Log để ghi log lỗi
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.englishapp.adapter.OptionAdapter
 import com.example.englishapp.data.ListeningQuestion
 import com.example.englishapp.data.OptionItem
-import com.example.englishapp.databinding.ActivityListenBinding // TODO: Import lớp binding cho layout Activity
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException // Import để bắt lỗi cú pháp JSON
-import com.google.gson.reflect.TypeToken
-import java.io.IOException
-import java.io.InputStream
+import com.example.englishapp.databinding.ActivityListenBinding
+import com.example.englishapp.repository.ListeningQuestionRepository
+import com.example.englishapp.R
+import com.example.englishapp.LoginActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class ListeningQuestionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityListenBinding
     private lateinit var optionAdapter: OptionAdapter
     private var mediaPlayer: MediaPlayer? = null
+    private lateinit var listeningQuestionRepository: ListeningQuestionRepository
+
+    private lateinit var auth: FirebaseAuth
 
     private var allQuestions: List<ListeningQuestion> = emptyList()
     private lateinit var currentQuestion: ListeningQuestion
     private var currentQuestionIndex: Int = 0
+
+    // Biến tích lũy điểm trong phiên làm bài hiện tại
+    private var totalScoreEarnedInThisSession: Long = 0L // Đặt biến này để tích lũy điểm cục bộ
+
+    // Số điểm người dùng nhận được cho mỗi câu trả lời đúng
+    private val POINTS_PER_CORRECT_ANSWER = 15L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,85 +41,58 @@ class ListeningQuestionActivity : AppCompatActivity() {
         binding = ActivityListenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // --- Cấu hình Toolbar ---
+        auth = FirebaseAuth.getInstance()
+
+        if (auth.currentUser == null) {
+            Toast.makeText(this, "Bạn cần đăng nhập để làm bài test nghe.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
+        listeningQuestionRepository = ListeningQuestionRepository(applicationContext)
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            // Khi người dùng bấm nút Back trên toolbar, kết thúc bài và trả điểm về
+            Log.d("ListeningActivity", "Người dùng bấm nút Back. Trả về điểm: $totalScoreEarnedInThisSession")
+            finishExerciseAndReturnScore(totalScoreEarnedInThisSession)
         }
 
-        // --- Đọc và Parsing dữ liệu từ JSON ---
-        loadQuestionsFromJson()
+        // Lấy tên file bài tập từ Intent
+        val exercisesFile = intent.getStringExtra("exercises_file")
+        if (exercisesFile != null) {
+            allQuestions = listeningQuestionRepository.getAllListeningQuestions(exercisesFile)
+        } else {
+            Toast.makeText(this, "Lỗi: Không tìm thấy file bài tập nghe.", Toast.LENGTH_SHORT).show()
+            Log.e("ListeningActivity", "Không nhận được tên file bài tập từ Intent.")
+            finishExerciseAndReturnScore(0L) // Trả về 0 điểm nếu không có file bài tập
+            return
+        }
 
-        // --- Hiển thị câu hỏi đầu tiên (nếu có) ---
         if (allQuestions.isNotEmpty()) {
             displayQuestion(currentQuestionIndex)
         } else {
-            Toast.makeText(this, "Lỗi: Không tải được dữ liệu câu hỏi. Kiểm tra Logcat.", Toast.LENGTH_LONG).show()
-            Log.e("ListeningActivity", "Không tải được dữ liệu câu hỏi. Danh sách rỗng.")
-            // Tùy chọn: Đóng Activity nếu không có dữ liệu để tránh crash tiếp
-            // finish()
+            Toast.makeText(this, "Lỗi: Không tải được dữ liệu câu hỏi nghe. Danh sách rỗng.", Toast.LENGTH_LONG).show()
+            Log.e("ListeningActivity", "Không tải được dữ liệu câu hỏi nghe. Danh sách rỗng hoặc file không đúng.")
+            finishExerciseAndReturnScore(0L) // Trả về 0 điểm nếu không có câu hỏi
         }
 
-        // --- Cấu hình Listener cho Icon Loa ---
         binding.speakerIcon.setOnClickListener {
             playAudio()
         }
 
-        // TODO: Cấu hình Listener cho Icon Rùa nếu cần
-        // binding.turtleIcon.setOnClickListener { ... }
-
-        // --- Cấu hình Listener cho nút KIỂM TRA ---
         binding.checkButton.setOnClickListener {
             handleCheckButtonClick()
         }
     }
 
-    // Hàm đọc nội dung file JSON từ thư mục assets
-    private fun getJsonDataFromAsset(context: Context, fileName: String): String? {
-        val jsonString: String
-        try {
-            // Mở file từ thư mục assets
-            val inputStream: InputStream = context.assets.open(fileName)
-            val size = inputStream.available()
-            val buffer = ByteArray(size)
-            inputStream.read(buffer)
-            inputStream.close()
-            jsonString = String(buffer, Charsets.UTF_8)
-            Log.d("ListeningActivity", "Đọc file JSON thành công: $fileName")
-            return jsonString
-        } catch (ioException: IOException) {
-            ioException.printStackTrace()
-            Log.e("ListeningActivity", "Lỗi đọc file JSON từ assets: $fileName", ioException)
-            Toast.makeText(context, "Lỗi: Không tìm thấy file JSON '$fileName'.", Toast.LENGTH_LONG).show()
-            return null
-        }
-    }
-
-    // Hàm đọc và Parsing dữ liệu câu hỏi từ JSON
-    private fun loadQuestionsFromJson() {
-        val jsonFileString = getJsonDataFromAsset(applicationContext, "listening_questions.json")
-
-        if (jsonFileString != null) {
-            val gson = Gson()
-            val listQuestionType = object : TypeToken<List<ListeningQuestion>>() {}.type
-            try {
-                allQuestions = gson.fromJson(jsonFileString, listQuestionType)
-                Log.d("ListeningActivity", "Parsing JSON thành công. Số câu hỏi: ${allQuestions.size}")
-            } catch (e: JsonSyntaxException) {
-                e.printStackTrace()
-                Log.e("ListeningActivity", "Lỗi cú pháp JSON: ", e)
-                Toast.makeText(this, "Lỗi: Cú pháp JSON không hợp lệ. Kiểm tra file.", Toast.LENGTH_LONG).show()
-                allQuestions = emptyList()
-            } catch (e: Exception) { // Bắt các lỗi khác có thể xảy ra trong quá trình parsing
-                e.printStackTrace()
-                Log.e("ListeningActivity", "Lỗi parsing JSON không xác định: ", e)
-                Toast.makeText(this, "Lỗi: Không thể phân tích dữ liệu JSON.", Toast.LENGTH_LONG).show()
-                allQuestions = emptyList()
-            }
-        } else {
-            allQuestions = emptyList()
-        }
+    // Hàm này được đổi tên và chỉ cộng điểm vào biến cục bộ
+    private fun addScoreLocally(pointsToAdd: Long) {
+        totalScoreEarnedInThisSession += pointsToAdd
+        Log.d("ListeningTest", "Điểm tích lũy trong phiên: $totalScoreEarnedInThisSession")
+        // Không cập nhật Firestore trực tiếp từ đây
     }
 
     // Hàm hiển thị câu hỏi tại một chỉ số cụ thể
@@ -119,17 +100,21 @@ class ListeningQuestionActivity : AppCompatActivity() {
         if (index >= 0 && index < allQuestions.size) {
             currentQuestion = allQuestions[index]
 
-            binding.instructionText.text = "Nghe và hoàn thành câu sau :" // TODO: Sử dụng String Resource
+            binding.instructionText.text = "Nghe và hoàn thành câu sau :"
             binding.sentenceText.text = "${currentQuestion.sentenceBeforeBlank} ___${currentQuestion.sentenceAfterBlank}"
 
             setupOptionsRecyclerView(currentQuestion.options.toMutableList())
 
-            binding.checkButton.backgroundTintList = getColorStateList(R.color.button_gray_background) // TODO: Sử dụng màu từ colors.xml
+            optionAdapter.clearSelection()
+
+            // Reset trạng thái lựa chọn của Adapter cho câu hỏi mới
+            binding.checkButton.backgroundTintList = getColorStateList(R.color.button_gray_background)
             binding.checkButton.setTextColor(getColorStateList(android.R.color.black))
             binding.checkButton.isEnabled = true
         } else {
-            Toast.makeText(this, "Đã hoàn thành tất cả câu hỏi!", Toast.LENGTH_SHORT).show()
-            finish()
+            Toast.makeText(this, "Bạn đã hoàn thành tất cả câu hỏi nghe!", Toast.LENGTH_LONG).show()
+            Log.d("ListeningActivity", "Đã hoàn thành tất cả câu hỏi nghe. Trả về $totalScoreEarnedInThisSession điểm.")
+            finishExerciseAndReturnScore(totalScoreEarnedInThisSession) // Kết thúc và trả điểm về
         }
     }
 
@@ -147,7 +132,7 @@ class ListeningQuestionActivity : AppCompatActivity() {
     // Hàm xử lý khi một tùy chọn đáp án được click
     private fun handleOptionClick(option: OptionItem, position: Int) {
         optionAdapter.selectItem(position)
-        binding.checkButton.isEnabled = true
+        binding.checkButton.isEnabled = true // Bật nút kiểm tra khi có lựa chọn
     }
 
     // Hàm phát âm thanh
@@ -182,19 +167,33 @@ class ListeningQuestionActivity : AppCompatActivity() {
         }
 
         if (selectedOption.id == currentQuestion.correctAnswerId) {
-            Toast.makeText(this, "Chính xác! Đáp án đúng là ${selectedOption.text}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Chính xác!", Toast.LENGTH_SHORT).show()
+            addScoreLocally(POINTS_PER_CORRECT_ANSWER) // Cộng điểm vào biến cục bộ
             currentQuestionIndex++
-            displayQuestion(currentQuestionIndex)
+            displayQuestion(currentQuestionIndex) // Hiển thị câu hỏi tiếp theo
         } else {
             val correctOption = currentQuestion.options.find { it.id == currentQuestion.correctAnswerId }
             val correctOptionText = correctOption?.text ?: "Đáp án đúng"
-            Toast.makeText(this, "Sai rồi. Đáp án đúng là: ${correctOptionText}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Sai rồi. Đáp án đúng là: ${correctOptionText}", Toast.LENGTH_LONG).show()
+            // Vẫn chuyển câu hỏi khi sai, không cộng điểm
+            currentQuestionIndex++
+            displayQuestion(currentQuestionIndex)
         }
     }
 
+    // Hàm này sẽ được gọi khi Activity bài tập kết thúc (bao gồm cả khi bấm nút back)
+    private fun finishExerciseAndReturnScore(score: Long) {
+        val resultIntent = Intent()
+        resultIntent.putExtra("score_earned", score) // Đặt điểm đã kiếm được vào Intent
+        setResult(RESULT_OK, resultIntent) // Đặt kết quả là OK
+        finish() // Đóng Activity bài tập
+    }
+
+    // Override onSupportNavigateUp để đảm bảo điểm được trả về khi người dùng bấm nút back trên Toolbar
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return true
+        // Gọi hàm finishExerciseAndReturnScore để trả điểm về HomeActivity
+        finishExerciseAndReturnScore(totalScoreEarnedInThisSession)
+        return true // Trả về true để hệ thống tự động xử lý nút back trên toolbar
     }
 
     override fun onDestroy() {
@@ -202,5 +201,4 @@ class ListeningQuestionActivity : AppCompatActivity() {
         mediaPlayer?.release()
         mediaPlayer = null
     }
-
 }
