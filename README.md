@@ -8,11 +8,14 @@ Tuấn mở app/src/main/java/com/example/englishapp/Ranking đọc mấy file t
 
         
 Quân mở app/src/main/java/com/example/englishapp/LoginActivity.kt
-        app/src/main/java/com/example/englishapp/RegisterActivity.kt
-        app/src/main/res/layout/activity_login.xml
-        app/src/main/res/layout/activity_register.xml
-        app/src/main/java/com/example/englishapp/VocabularyScreen
-        app/src/main/java/com/example/englishapp/repository/VocabularyQuestionRepository.kt
+                app/src/main/java/com/example/englishapp/RegisterActivity.kt
+                app/src/main/res/layout/activity_login.xml
+                app/src/main/res/layout/activity_register.xml
+                app/src/main/java/com/example/englishapp/VocabularyScreen
+                app/src/main/java/com/example/englishapp/repository/VocabularyQuestionRepository.kt
+
+
+        
 Nhớ là mấy cái logo nằm trong drawable 
 Cấu hình grade của firebase nằm trong app/build.gradle.kts
 Data của mỗi câu hỏi được code dạng json nằm trong app/src/main/assets .......... để đọc được file json thì nằm trong app/src/main/java/com/example/englishapp/utils/JsonAssetReader.kt
