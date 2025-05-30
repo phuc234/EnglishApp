@@ -17,6 +17,12 @@ Quân mở app/src/main/java/com/example/englishapp/LoginActivity.kt
 
         
 Nhớ là mấy cái logo nằm trong drawable 
+
+
 Cấu hình grade của firebase nằm trong app/build.gradle.kts
+
+
 Data của mỗi câu hỏi được code dạng json nằm trong app/src/main/assets .......... để đọc được file json thì nằm trong app/src/main/java/com/example/englishapp/utils/JsonAssetReader.kt
+
+
 Nhớ là mỗi giao diện sẽ có file tương ứng nằm trong res/layout ae vô trong đó tìm rồi hỏi chatgpt là sẽ hiểu
