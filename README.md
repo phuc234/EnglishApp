@@ -1,6 +1,8 @@
-Tuấn mở app/src/main/java/com/example/englishapp/Ranking đọc mấy file trong này 
+Tuấn mở 
 
         app/src/main/java/com/example/englishapp/ProfileActivity.kt 
+
+        app/src/main/java/com/example/englishapp/Ranking đọc mấy file trong này 
         
         app/src/main/res/layout/activity_profile.xml 
         
@@ -12,9 +14,11 @@ Tuấn mở app/src/main/java/com/example/englishapp/Ranking đọc mấy file t
 
 
         
-Quân mở app/src/main/java/com/example/englishapp/LoginActivity.kt
+Quân mở 
 
                 app/src/main/java/com/example/englishapp/RegisterActivity.kt
+                
+                app/src/main/java/com/example/englishapp/LoginActivity.kt
                 
                 app/src/main/res/layout/activity_login.xml
                 
