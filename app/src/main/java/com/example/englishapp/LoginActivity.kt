@@ -1,4 +1,4 @@
-package com.example.englishapp // TODO: Thay thế bằng package thực tế của bạn
+package com.example.englishapp
 
 import android.content.Intent
 import android.os.Bundle
@@ -59,7 +59,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // TODO: Xử lý sự kiện "Quên mật khẩu?" nếu cần
         binding.textViewForgotPassword.setOnClickListener {
             Toast.makeText(this, "Chức năng quên mật khẩu đang được phát triển.", Toast.LENGTH_SHORT).show()
         }

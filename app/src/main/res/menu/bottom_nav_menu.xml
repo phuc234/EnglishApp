@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_home"
-        android:icon="@drawable/trainslat" android:title=" " />
+        android:icon="@drawable/ic_home" android:title=" " />
     <item
         android:id="@+id/navigation_trainslate"
         android:icon="@drawable/translate" android:title=" " />

@@ -36,12 +36,12 @@
     "required_score_to_unlock_next": 110,
     "modules": [
       {
-        "id": "module_grammar_2",
-        "name": "Ngữ pháp Nâng cao",
-        "image_name": "icon_grammar",
-        "type": "grammar",
-        "description": "Đi sâu vào các chủ điểm ngữ pháp phức tạp hơn.",
-        "exercises_file": "grammar_exercises_level2.json"
+        "id": "module_reading_2",
+        "name": "Đọc hiêu",
+        "image_name": "icon_reading",
+        "type": "reading",
+        "description": "Đọc hiểu và điền các câu.",
+        "exercises_file": "reading.json"
       }
     ]
   }

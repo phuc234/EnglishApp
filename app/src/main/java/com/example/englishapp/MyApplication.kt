@@ -1,5 +1,4 @@
-package com.example.englishapp // Đảm bảo đây là package gốc của ứng dụng của bạn
-
+package com.example.englishapp
 import android.app.Application
 import com.google.firebase.FirebaseApp
 import android.util.Log

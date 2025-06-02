@@ -55,7 +55,7 @@ class TopicSelectionActivity : AppCompatActivity() {
 
     // Hàm xử lý khi một Chủ đề được click
     private fun handleTopicClick(topic: Topic) {
-        // TODO: Xử lý logic khi chọn chủ đề. Ví dụ: chuyển sang màn hình LevelModuleActivity
+        // TODO: Xử lý logic khi chọn chủ đề.
         val intent = Intent(this, HomeActivity::class.java) // TODO: Thay LevelModuleActivity bằng tên Activity bạn tạo
         // Tùy chọn: Truyền ID hoặc thông tin của chủ đề đã chọn sang màn hình tiếp theo
         intent.putExtra("SELECTED_TOPIC_ID", topic.id)

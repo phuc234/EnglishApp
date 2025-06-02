@@ -1,0 +1,41 @@
+[
+  {
+    "id": "reading_q1",
+    "passage": "London is the capital and largest city of England and the United Kingdom. Standing on the River Thames in the south-east of England, it has been a major settlement for two millennia. The City of London, London's ancient core, contains the Bank of England, St Paul's Cathedral, and the Monument. London is a leading global city in arts, commerce, education, entertainment, fashion, finance, healthcare, media, professional services, research and development, tourism, and transport.",
+    "questions": [
+      {
+        "question_id": "q1_1",
+        "question_text": "What is the capital of the United Kingdom?",
+        "options": [
+          {"id": "opt1_1", "prefix": "A", "text": "Paris"},
+          {"id": "opt1_2", "prefix": "B", "text": "London"},
+          {"id": "opt1_3", "prefix": "C", "text": "New York"}
+        ],
+        "correct_answer_id": "opt1_2",
+        "type": "multiple_choice"
+      },
+      {
+        "question_id": "q1_2",
+        "question_text": "Which river flows through London?",
+        "options": [
+          {"id": "opt2_1", "prefix": "A", "text": "River Thames"},
+          {"id": "opt2_2", "prefix": "B", "text": "River Seine"},
+          {"id": "opt2_3", "prefix": "C", "text": "River Nile"}
+        ],
+        "correct_answer_id": "opt2_1",
+        "type": "multiple_choice"
+      },
+        {
+            "question_id": "q1_3",
+            "question_text": "What is one of the major financial institutions in London?",
+            "options": [
+            {"id": "opt3_1", "prefix": "A", "text": "Bank of England"},
+            {"id": "opt3_2", "prefix": "B", "text": "Federal Reserve"},
+            {"id": "opt3_3", "prefix": "C", "text": "European Central Bank"}
+            ],
+            "correct_answer_id": "opt3_1",
+            "type": "multiple_choice"
+        }
+    ]
+  }
+]

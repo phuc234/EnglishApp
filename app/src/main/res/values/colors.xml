@@ -12,5 +12,16 @@
     <color name="gold_rank">#FFEB3B</color>
     <color name="silver_rank">#656E73</color>
     <color name="bronze_rank">#B8853F</color>
-
+    <color name="blue_selected">#2196F3</color>
+    <color name="blue_border">#1976D2</color>
+    <color name="gray_light">#E0E0E0</color>
+    <color name="color_background">#F5F5F5</color>
+    <color name="red_incorrect">#D32F2F</color>
+    <color name="red_incorrect_light">#FFCDD2</color>
+    <color name="green_correct_light">#8BC34A</color>
+    <color name="green_correct">#4CAF50</color>
+    <color name="red_incorrect_border">#D32F2F</color>
+    <color name="green_correct_border">#4CAF50</color>
+    <color name="light_gray_background">#F0F0F0</color>
+    <color name="gray_border">#BDBDBD</color>
 </resources>

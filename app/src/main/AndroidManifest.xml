@@ -30,12 +30,12 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".TopicSelectionActivity" />
-        <activity android:name=".LevelModuleActivity" />
         <activity android:name=".VocabularyScreen.VocabularyQuestionActivity" />
         <activity android:name=".Question.FillBlankQuestionActivity" />
         <activity android:name=".Listening.ListeningQuestionActivity" />
         <activity android:name=".TranslateActivity" />
         <activity android:name=".ProfileActivity"/>
         <activity android:name=".RankingActivity"/>
+        <activity android:name=".Reading.ReadingQuestionActivity" />
     </application>
 </manifest>

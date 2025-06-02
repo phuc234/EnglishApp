@@ -79,9 +79,9 @@ class VocabularyOptionAdapter(
             notifyItemChanged(oldSelectedPosition) // Cập nhật trạng thái của item cũ
             notifyItemChanged(selectedPosition) // Cập nhật trạng thái của item mới
         } else {
-            // Nếu click lại vào item đã chọn, có thể bỏ chọn nó (tùy logic game)
-            // selectedPosition = RecyclerView.NO_POSITION
-            // notifyItemChanged(oldSelectedPosition)
+//           bỏ chọn
+             selectedPosition = RecyclerView.NO_POSITION
+             notifyItemChanged(oldSelectedPosition)
         }
     }
 
