@@ -8,27 +8,24 @@ Tuấn mở
         
         app/src/main/res/layout/activity_ranking.xml và item_rank.xml 
         
-        app/src/main/java/com/example/englishapp/Question
-        
-        app/src/main/java/com/example/englishapp/repository/FillBlankQuestionRepository.kt
-
+        app/src/main/java/com/example/englishapp/Reading đọc các file trong này 
 
         
 Quân mở 
 
-                app/src/main/java/com/example/englishapp/RegisterActivity.kt
+                app/src/main/java/com/example/englishapp/HomeActivity.kt
                 
-                app/src/main/java/com/example/englishapp/LoginActivity.kt
-                
-                app/src/main/res/layout/activity_login.xml
-                
-                app/src/main/res/layout/activity_register.xml
+                app/src/main/res/menu/bottom_nav_menu.xml
+
+                app/src/main/java/com/example/englishapp/Question
+
+                app/src/main/java/com/example/englishapp/repository/FillBlankQuestionRepository.kt
                 
                 app/src/main/java/com/example/englishapp/VocabularyScreen
                 
                 app/src/main/java/com/example/englishapp/repository/VocabularyQuestionRepository.kt
 
-
+                
         
 Nhớ là mấy cái logo nằm trong drawable 
 
