@@ -95,8 +95,6 @@ class ProfileActivity : AppCompatActivity() {
                     binding.emailEditText.setText(email ?: "")
                     binding.passwordEditText.setText("********") // Giữ ở dạng ẩn
 
-                    // (Tùy chọn) Cập nhật vị trí nếu bạn có trường này trong Firestore
-                    // binding.userLocationTextView.text = document.getString("location") ?: "Unknown Location"
 
                 } else {
                     Log.d("ProfileActivity", "Không tìm thấy thông tin người dùng trong Firestore.")
